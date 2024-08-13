@@ -1,0 +1,32 @@
+
+x-default: &default
+  build:
+    dockerfile: Dockerfile
+  volumes:
+    - ./code:/src/mysite.local
+  networks:
+    - app-network
+
+services:
+  nginx:
+    <<: *default
+    container_name: webserver
+    image: myapp/nginx
+    build:
+      context: ./nginx
+    ports:
+      - "81:80"
+    volumes:
+      - ./mysite.local:/app/mysite.local
+  application:
+    <<: *default
+    container_name: application
+    image: myapp/php
+    volumes:
+      - ./mysite.local:/app/mysite.local
+    build:
+      context: ./fpm
+
+networks:
+  app-network:
+    driver: bridge
